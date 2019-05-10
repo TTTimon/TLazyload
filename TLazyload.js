@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+    var lazyImages = [].slice.call(document.querySelectorAll("img.lazy, .lazy-bg"));
     if ("IntersectionObserver" in window) {
         __LazyLoadByImgWithIntersectionObserver(lazyImages);
     } else {
@@ -12,8 +12,17 @@ function __LazyLoadByImgWithIntersectionObserver(lazyImages){
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 var lazyImage = entry.target;
-                lazyImage.src = lazyImage.dataset.src;
-                lazyImage.classList.remove("lazy");
+                // если элемент - это img с атрибутом data-src,
+                // img src = img data-src
+                if (lazyImage.hasAttribute('data-src')) {
+                    lazyImage.src = lazyImage.dataset.src;
+                    lazyImage.classList.remove("lazy");
+                }
+                // если элемент - это блок, которому нужно установить background-image, присваиваем стиль
+                if (lazyImage.hasAttribute('data-lazybg')) {
+                    lazyImage.style.backgroundImage = "url("+lazyImage.dataset.lazybg+")";
+                    lazyImage.classList.remove("lazy-bg");
+                }
                 lazyImageObserver.unobserve(lazyImage);
             }
         });
@@ -32,10 +41,20 @@ function __LazyLoadByImgWithoutIntersectionObserver(lazyImages){
             setTimeout(function() {
                 lazyImages.forEach(function(lazyImage) {
                     if ((lazyImage.getBoundingClientRect().top <= window.innerHeight  && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                        
+                        // если элемент - это img с атрибутом data-src,
+                        // img src = img data-src
+                        if (lazyImage.hasAttribute('data-src')) {
                             lazyImage.src = lazyImage.dataset.src;
                             lazyImage.classList.remove("lazy");
+                        }
+                        // если элемент - это блок, которому нужно установить background-image, присваиваем стиль
+                        if (lazyImage.hasAttribute('data-lazybg')) {
+                            lazyImage.style.backgroundImage = "url("+lazyImage.dataset.lazybg+")";
+                            lazyImage.classList.remove("lazy-bg");
+                        }
 
-                            lazyImages = lazyImages.filter(function(image) {
+                        lazyImages = lazyImages.filter(function(image) {
                             return image !== lazyImage;
                         });
 
@@ -58,22 +77,3 @@ function __LazyLoadByImgWithoutIntersectionObserver(lazyImages){
     window.scrollBy(0,1);
     window.scrollTo(0,0);
 };
-
-document.addEventListener("DOMContentLoaded", function() {
-    var lazyBackgrounds = [].slice.call(document.querySelectorAll(".lazy-background"));
-  
-    if ("IntersectionObserver" in window) {
-      var lazyBackgroundObserver = new IntersectionObserver(function(entries, observer) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            lazyBackgroundObserver.unobserve(entry.target);
-          }
-        });
-      });
-  
-      lazyBackgrounds.forEach(function(lazyBackground) {
-        lazyBackgroundObserver.observe(lazyBackground);
-      });
-    }
-  });
