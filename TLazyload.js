@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var lazyImages = [].slice.call(document.querySelectorAll("img.lazy, .lazy-bg"));
+    var lazyImages = [].slice.call(document.querySelectorAll(".lazy-img, .lazy-bg"));
     lazyImages.forEach(function(lazyImage) {
         _ChangeAttrs(lazyImage);
     });
@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", function() {
 function _ChangeAttrs(lazyImage){
     // если элемент - это img с атрибутом data-src,
     // img src = img data-src
-    if (lazyImage.hasAttribute('data-src')) {
-        lazyImage.src = lazyImage.dataset.src;
-        lazyImage.classList.remove("lazy");
+    if (lazyImage.hasAttribute('lazy-img')) {
+        lazyImage.src = lazyImage.getAttribute('lazy-img');
+        lazyImage.classList.remove("lazy-img");
     }
     // если элемент - это блок, которому нужно установить background-image, присваиваем стиль
-    if (lazyImage.hasAttribute('data-lazy_bg')) {
-        lazyImage.style.backgroundImage = "url("+lazyImage.dataset.lazy_bg+")";
+    if (lazyImage.hasAttribute('lazy-bg')) {
+        lazyImage.style.backgroundImage = "url("+lazyImage.getAttribute('lazy-bg')+")";
         lazyImage.classList.remove("lazy-bg");
     } 
 }
